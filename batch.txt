@@ -1,0 +1,188 @@
+GLM api 创建批处理任务代码
+
+必须参数：input_file_id
+上传文件的 ID，该文件包含Batch的请求。输入文件必须是 .Jsonl 格式，并且文件上传时的目的必须标记为"batch"。
+
+from zai import ZhipuAiClient
+
+client = ZhipuAiClient(api_key="59856fbdedc949b993a04e2c057aa6fd.y1mbUzy6KYfhx5lK")  # 填写您自己的APIKey
+
+# 创建 Batch 任务
+create = client.batches.create(
+    input_file_id="file_123",
+    endpoint="/v4/chat/completions",
+    auto_delete_input_file=True,
+    metadata={
+        "description": "Sentiment classification"
+    }
+)
+print(create)
+
+# 检索 Batch 任务
+retrieve = client.batches.retrieve("batch_123")
+print(retrieve)
+
+# 取消 Batch 任务
+cancel = client.batches.cancel("batch_123")
+print(cancel)
+
+# 列出 Batch 任务
+# after	String	非必填	此参数用作分页游标，指定从特定对象ID之后开始检索列表。例如，如果您的上一请求返回了包含对象 obj_foo 的列表，并希望继续从这一点获取后续内容，可以将 after=obj_foo 包括在您的下一请求中以获取下一页数据。
+# limit	int	非必填	限制返回对象的数量。limit 的范围可以是 1 到 100，默认值为 20。
+batch_list = client.batches.list(limit=10)
+print(batch_list)
+# SyncCursorPage的get_next_page 可用于获取当前 after+1的数据
+next_page = batch_list.get_next_page()
+print(next_page)
+# SyncCursorPage的iter_pages 返回一个分页迭代器，可以使用collections相关api
+for batch in batch_list.iter_pages():
+    print(batch)
+
+# 下载 Batch 结果
+# file_id	String	必填	被请求的文件的唯一标识符，用于指定要获取内容的特定文件。
+# client.files.content返回 _legacy_response.HttpxBinaryResponseContent实例
+content = client.files.content("result_123")
+# 使用write_to_file方法把返回结果写入文件
+content.write_to_file("write_to_file_batchoutput.jsonl")
+
+GLM api上传文件代码
+
+import requests
+
+url = "https://open.bigmodel.cn/api/paas/v4/files"
+
+files = { "file": "open('example-file', 'rb')" }
+payload = { "purpose": "batch" }
+headers = {"Authorization": "Bearer 73c95dbd36ed48bdbe79ead423219d4e.8pZApezlT8JLM4Rr"}
+
+GLM-4V-Plus-0111 api视觉理解模型调用代码
+
+上传图片URL示例
+from zai import ZhipuAiClient
+client = ZhipuAiClient(api_key="") # 请填写您自己的APIKey
+response = client.chat.completions.create(
+    model="glm-4v",  # 请填写您要调用的模型名称
+    messages=[
+        {
+                'role': 'user',
+                'content': [
+                    {'type': 'text', 'text': "What's in this image?"},
+                    {'type': 'image_url', 'image_url': {'url': f'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo.jpg'}},
+                ],
+            }
+    ],
+    temperature=0.5,
+    max_tokens=2000,
+)
+print(response.choices[0].message.content)
+
+
+多轮图片对话示例
+
+from zai import ZhipuAiClient
+
+client = ZhipuAiClient(api_key="YOUR API KEY")  # 填写您自己的APIKey
+response = client.chat.completions.create(
+    model="glm-4v-plus-0111",  # 填写需要调用的模型名称
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": "https://cdn.bigmodel.cn/xxxxxx.png"
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": "图中有什么"
+                }
+            ]
+        },
+        {
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": (
+                        "这是一幅描绘自然风景的画，展现了一片宁静的湖泊，湖水呈现出深浅不一的蓝绿色调。"
+                        "湖边长着一棵盛开的樱花树，粉白色的花朵在阳光下显得格外鲜艳。树下有一位身穿蓝色衣服的人坐在船上，"
+                        "似乎正在享受这美好的时光。\n\n"
+                        "背景是连绵起伏的山脉，山体被绿色的植被覆盖，山顶则被云雾缭绕，增添了几分神秘感。"
+                        "远处还可以看到一座小亭子，它坐落在湖边的岩石上，与周围的自然环境和谐相融。\n\n"
+                        "整个画面给人一种宁静、和谐的感觉，仿佛置身于一个世外桃源之中。"
+                    )
+                }
+            ]
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": "https://cdn.bigmodel.cn/xxxxxxx.jpeg"
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": "这个图与上面图有什么不一样"
+                }
+            ]
+        },
+        {
+            "role": "assistant",
+            "content": [
+                {
+                    "type": "text",
+                    "text": (
+                        "第一张图和第二张图在画面内容、构图、色彩等方面都有很大的不同，形成鲜明的对比。\n\n"
+                        "1.第一张图是风景画，主要描绘了自然风景，如樱花树、湖泊、山脉等，色彩丰富，充满春天的气息，"
+                        "而第二张图是描绘长城在冬季的风景照片，长城在白雪覆盖的山脉中蜿蜒盘旋，整体色调偏冷，"
+                        "给人一种寒冷、宁静的感觉。\n\n"
+                        "2.构图上，第一张图采用对称式构图，以樱花树为中心，两侧的景物相互呼应，形成平衡和谐的画面效果，"
+                        "第二张图则采用对角线构图，长城作为视觉引导线，引导观众的视线穿越整个画面，增加画面的深度和动态感。\n\n"
+                        "整体来看，这两张图在画面内容、色彩、构图和氛围上都呈现出明显的对比，一张是充满生机和色彩的春日风景画，"
+                        "另一张是宁静而神秘的冬日长城风景照。"
+                    )
+                }
+            ]
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": "https://cdn.bigmodel.cn/xxxxxxx.jpeg"
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": "这个图与上一张图有什么区别"
+                }
+            ]
+        }
+    ]
+)
+print(response.choices[0].message.content)
+
+GLM 批处理jsonl文件示例
+
+	{"messages": [{"role": "user", "content": [{"type": "image_url", "image_url": {"url": "file:///path/to/image1.jpg"}}, {"type": "text", "text": "请描述这张图片中的主要内容和场景"}]}], "image": "file:///path/to/image1.jpg"}
+	{"messages": [{"role": "user", "content": [{"type": "image_url", "image_url": {"url": "file:///path/to/image2.png"}}, {"type": "text", "text": "分析这张图表中的数据趋势，并给出结论"}]}], "image": "file:///path/to/image2.png"}
+	{"messages": [{"role": "user", "content": [{"type": "image_url", "image_url": {"url": "file:///path/to/image3.jpeg"}}, {"type": "text", "text": "识别图中所有物体，并按类别分组"}]}], "image": "file:///path/to/image3.jpeg"}
+
+    
+
+需要处理的图片URL
+
+{
+https://mpas.playinjoy.com/202508/b3dfdd2d-eef9-43f4-a447-8ba246c6612f.jpg,
+https://mpas.playinjoy.com/202508/aa8f8523-dc1a-410d-a31b-e96f634ca4c9.jpg,
+https://mpas.playinjoy.com/202508/16ed90f9-577a-4bfa-8269-513186481bc9.jpg,
+https://mpas.playinjoy.com/202508/c00e1e22-83c5-4657-9199-86f95cf9f608.jpg,
+}
+
+
