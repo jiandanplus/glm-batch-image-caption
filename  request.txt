@@ -1,0 +1,8 @@
+glm批量处理项目需求：
+1.根据提供的example.jsonl文件生成符合格式要求的jsonl文件
+2.读取image_url.txt文件，将image_url.txt中的图片地址填写进jsonl文件中对应的位置
+3.上传.jsonl文件到glm，并返回input_file_id
+4.通过返回的input_file_id创建glm批处理任务，返回status、input_file_id、output_file_id、created_at、completed_at
+5。根据created_at和completed_at之间的时间段，计算任务永世
+6.通过output_file_id获取处理结果，并提取返回结果中的request_id、content，
+7.以request_id命名，创建txt文件，将对应的content写入txt文件中

@@ -1,0 +1,31 @@
+{"response":{"status_code":200,"body":{"created":1756185620,"usage":{"completion_tokens":146,"prompt_tokens":3067,"total_tokens":3213},"model":"glm-4v-plus-0111","id":"202508261320114de2ec9150b8404c","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"This image portrays a woman with a serene and elegant demeanor. Her hair is styled in a sleek, low bun, adorned with delicate flowers in shades of purple and white, adding a touch of natural beauty to her look. She is wearing a sophisticated black dress with a unique neckline that drapes gracefully over one shoulder. The dress is embellished with intricate gold floral embroidery, which adds a luxurious and refined touch to the overall outfit. The background is a simple, neutral gray, ensuring that the focus remains on her and the details of her attire. The lighting is soft, highlighting her features and the textures of the fabric. This image exudes a sense of elegance and poise, capturing a moment of quiet confidence and beauty."}}],"request_id":"image_001"}},"custom_id":"image_001","id":"batch_1960209276224012288"}
+{"response":{"status_code":200,"body":{"created":1756185622,"usage":{"completion_tokens":106,"prompt_tokens":3067,"total_tokens":3173},"model":"glm-4v-plus-0111","id":"20250826132015547b1a11ba364afc","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"This image features a young woman standing outdoors in a casual setting. She is wearing a navy blue short-sleeved shirt adorned with horizontal yellow stripes. Her hair is long, straight, and brown, cascading over her shoulders. The background is slightly blurred, suggesting a shallow depth of field, but it appears to be a garden or park with greenery and possibly some buildings in the distance. The lighting is natural, indicating that the photo was taken during the day. The overall mood of the image is relaxed and cheerful."}}],"request_id":"image_003"}},"custom_id":"image_003","id":"batch_1960209276224012288"}
+{"response":{"status_code":200,"body":{"created":1756185622,"usage":{"completion_tokens":138,"prompt_tokens":3651,"total_tokens":3789},"model":"glm-4v-plus-0111","id":"2025082613201399871ed4ae474637","choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"This image features a playful and whimsical scene. A person is sitting on a bed, dressed in a casual outfit consisting of a white tank top, gray shorts, and a light blue shirt. The background is simple and clean, emphasizing the main subject. Adding a touch of fun, two teddy bears are suspended from a clothesline above using colorful clothespins. One teddy bear is white, and the other is brown and dressed in a black graduation gown with a cap. The person's hair is creatively styled with bunny ears, enhancing the playful and lighthearted mood of the image. The overall composition is bright and cheerful, capturing a moment of joy and imagination."}}],"request_id":"image_002"}},"custom_id":"image_002","id":"batch_1960209276224012288"}
+{
+    "response":{
+        "status_code":200,
+        "body":{
+            "created":1756185629,
+            "usage":{
+                "completion_tokens":177,
+                "prompt_tokens":3651,
+                "total_tokens":3828
+            },
+            "model":"glm-4v-plus-0111",
+            "id":"20250826132017a803e1b8ddba4e68",
+            "choices":[
+                {
+                "finish_reason":"stop",
+                "index":0,
+                "message":{
+                    "role":"assistant",
+                    "content":"A woman in a beige, sequined dress sits gracefully on a city sidewalk at night. Her attire shimmers under the streetlights, complementing the glamorous urban backdrop. She wears delicate gold jewelry, including bracelets and a necklace, adding to her elegant appearance. Her long, dark hair cascades over her shoulders, and she has a poised, contemplative expression. \n\nBehind her, the city is alive with vibrant lights. Tall buildings, adorned with golden illumination, tower over the scene, their architectural details highlighted by the nighttime glow. The streets are bustling with cars, their headlights creating streaks of light through the night. A prominent building with a blue-lit spire stands out against the dark sky, adding a modern touch to the historic cityscape. The overall atmosphere is one of sophistication and urban charm, capturing a moment of serene beauty amidst the city's dynamic energy."
+                    }
+                }
+            ],
+            "request_id":"image_004"
+            }
+        },
+        "custom_id":"image_004",
+        "id":"batch_1960209276224012288"
+    }

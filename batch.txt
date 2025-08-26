@@ -5,7 +5,7 @@ GLM api 创建批处理任务代码
 
 from zai import ZhipuAiClient
 
-client = ZhipuAiClient(api_key="59856fbdedc949b993a04e2c057aa6fd.y1mbUzy6KYfhx5lK")  # 填写您自己的APIKey
+client = ZhipuAiClient(api_key="0fb3b2fe955446ad8242430b14656cef.TPW91E6YZyJeH0dS")  # 填写您自己的APIKey
 
 # 创建 Batch 任务
 create = client.batches.create(
