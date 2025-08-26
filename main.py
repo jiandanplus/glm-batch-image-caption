@@ -3,16 +3,53 @@ import json
 import time
 import requests
 from zhipuai import ZhipuAI
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # 配置信息
-API_KEY = "0fb3b2fe955446ad8242430b14656cef.TPW91E6YZyJeH0dS"
-IMAGE_URLS = [
-    "https://mpas.playinjoy.com/202508/b3dfdd2d-eef9-43f4-a447-8ba246c6612f.jpg",
-    "https://mpas.playinjoy.com/202508/aa8f8523-dc1a-410d-a31b-e96f634ca4c9.jpg",
-    "https://mpas.playinjoy.com/202508/16ed90f9-577a-4bfa-8269-513186481bc9.jpg",
-    "https://mpas.playinjoy.com/202508/c00e1e22-83c5-4657-9199-86f95cf9f608.jpg",
-]
-PROMPT = "Write a stable diffusion prompt for this image within 256 words."
+API_KEY = os.getenv("ZHIPUAI_API_KEY")
+if not API_KEY:
+    raise ValueError("未找到API密钥。请确保已创建.env文件并设置了ZHIPUAI_API_KEY变量。")
+
+def load_image_urls_from_json(json_file_path):
+    """从JSON文件中加载图片URL列表"""
+    try:
+        with open(json_file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            # 检查是否为URL列表格式
+            if isinstance(data, list):
+                return data
+            # 检查是否为包含image_urls键的字典格式
+            elif isinstance(data, dict) and "image_urls" in data:
+                return data["image_urls"]
+            else:
+                raise ValueError("JSON文件格式不正确，应为URL列表或包含'image_urls'键的对象")
+    except FileNotFoundError:
+        raise FileNotFoundError(f"未找到文件: {json_file_path}")
+    except json.JSONDecodeError as e:
+        raise ValueError(f"JSON文件解析错误: {e}")
+
+def load_prompt_from_json(json_file_path):
+    """从JSON文件中加载提示词"""
+    try:
+        with open(json_file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            # 检查是否为包含prompt键的字典格式
+            if isinstance(data, dict) and "prompt" in data:
+                return data["prompt"]
+            else:
+                raise ValueError("JSON文件格式不正确，应为包含'prompt'键的对象")
+    except FileNotFoundError:
+        raise FileNotFoundError(f"未找到文件: {json_file_path}")
+    except json.JSONDecodeError as e:
+        raise ValueError(f"JSON文件解析错误: {e}")
+
+# 从json/image_url.json文件加载图片URL
+IMAGE_URLS = load_image_urls_from_json("json/image_url.json")
+
+# 从json/prompt.json文件加载提示词
+PROMPT = load_prompt_from_json("json/prompt.json")
 
 def generate_jsonl(image_urls, out_path):
     """根据图片URL生成符合格式要求的jsonl文件"""
@@ -44,16 +81,32 @@ def upload_file(file_path, api_key):
     url = "https://open.bigmodel.cn/api/paas/v4/files"
     headers = {"Authorization": f"Bearer {api_key}"}
     data = {"purpose": "batch"}
-    with open(file_path, "rb") as f:
-        files = {"file": (os.path.basename(file_path), f, "application/json")}
-        response = requests.post(url, headers=headers, files=files, data=data)
-    print("上传响应：", response.text)
-    response.raise_for_status()
-    resp_json = response.json()
-    file_id = resp_json.get("file_id") or resp_json.get("id") or resp_json.get("data", {}).get("id")
-    if not file_id:
-        raise ValueError(f"上传成功但未返回 file id，响应: {resp_json}")
-    return file_id
+    
+    try:
+        with open(file_path, "rb") as f:
+            files = {"file": (os.path.basename(file_path), f, "application/json")}
+            response = requests.post(url, headers=headers, files=files, data=data)
+        
+        print("上传响应：", response.text)
+        
+        # 检查响应状态码
+        if response.status_code != 200:
+            raise ValueError(f"文件上传失败，HTTP状态码: {response.status_code}，响应: {response.text}")
+            
+        resp_json = response.json()
+        file_id = resp_json.get("file_id") or resp_json.get("id") or resp_json.get("data", {}).get("id")
+        
+        if not file_id:
+            raise ValueError(f"上传成功但未返回 file id，响应: {resp_json}")
+            
+        return file_id
+        
+    except FileNotFoundError:
+        raise ValueError(f"找不到要上传的文件: {file_path}")
+    except requests.exceptions.RequestException as e:
+        raise ValueError(f"网络请求失败: {str(e)}")
+    except json.JSONDecodeError:
+        raise ValueError(f"无法解析服务器响应，原始响应: {response.text}")
 
 def create_batch(input_file_id, api_key):
     """通过input_file_id创建glm批处理任务"""
@@ -96,12 +149,13 @@ def parse_batch_result(result_file):
                     
                     if request_id and content:
                         # 以request_id命名，创建txt文件，将对应的content写入txt文件中
-                        txt_filename = f"{request_id}.txt"
+                        # 修改为将文件保存到prompt_output文件夹下
+                        txt_filename = f"prompt_output/{request_id}.txt"
                         with open(txt_filename, "w", encoding="utf-8") as txt_file:
                             txt_file.write(content)
                         print(f"已创建文件 {txt_filename}")
                 except json.JSONDecodeError:
-                    print(f"解析行失败: {line}")
+                    print(f"JSON解析失败，无法解析返回结果。原始数据: {line}")
 
 def calculate_duration(created_at, completed_at):
     """根据created_at和completed_at之间的时间段，计算任务用时"""
