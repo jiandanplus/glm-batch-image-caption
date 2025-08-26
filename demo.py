@@ -1,7 +1,7 @@
 import os
 import json
 import requests
-from zai import ZhipuAiClient
+from zhipuai import ZhipuAI  # 新版本中使用 ZhipuAI 而不是 ZhipuAiClient
 def generate_jsonl(image_urls, out_path):
     prompt = "请为这张图片生成正式风格的描述性英文标题"
     with open(out_path, "w", encoding="utf-8") as f:
@@ -62,7 +62,8 @@ def upload_file(file_path, api_key):
         raise ValueError(f"上传成功但未返回 file id，响应: {resp_json}")
     return file_id
 def create_batch(file_id, api_key):
-    client = ZhipuAiClient(api_key=api_key)
+    client = ZhipuAI(api_key=api_key)  # 使用新的类名
+    # 其余代码保持不变
     create = client.batches.create(
         input_file_id=file_id,
         endpoint="/v4/vision/chat/completions",
